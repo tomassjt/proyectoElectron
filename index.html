@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Detector de Dispositivos USB</title>
+</head>
+<body>
+    <h1>Dispositivos USB Conectados</h1>
+    <ul id="usbDevices"></ul>
+
+    <script>
+    const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('usb-device-connected', (event, device) => {
+      const usbDevicesList = document.getElementById('usbDevices');
+      const listItem = document.createElement('li');
+      listItem.textContent = `Vendor ID: ${device.vendorId}, Product ID: ${device.productId}`;
+      usbDevicesList.appendChild(listItem);
+    });
+
+    ipcRenderer.on('usb-device-disconnected', (event, device) => {
+      const usbDevicesList = document.getElementById('usbDevices');
+      const items = usbDevicesList.getElementsByTagName('li');
+      Array.from(items).forEach(item => {
+        if (item.textContent.includes(`Vendor ID: ${device.vendorId}, Product ID: ${device.productId}`)) {
+          usbDevicesList.removeChild(item);
+        }
+      });
+    });
+
+    function printToUSB(data) {
+      ipcRenderer.send('print-to-usb', data);
+    }
+    </script>
+</body>
+</html>
